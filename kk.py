@@ -93,8 +93,6 @@ class Bullet(pygame.sprite.Sprite):
             self.kill()
 
 
-
-
 class Tower(pygame.sprite.Sprite):
     def __init__(self, x_cell, y_cell):
         super.__init__(all_sprites, group_tower)
@@ -141,9 +139,53 @@ class MachineGun(Tower):
         Bullet(self.senter_cell_tower, self.speed_of_the_bullet, self.enemy_tsel, self.damage)
 
 
+class Artillery(Tower):
+    def __init__(self, x_kletki_razmechenia, y_kletki_razmechenia, rate_of_fire, radius_of_the_fire=50,
+                 speed_of_the_bullet=5, type_of_amunition="base"):
+        super.__init__(x_kletki_razmechenia, y_kletki_razmechenia)  # нужно окрасить холст
+        self.radius_of_the_fire = radius_of_the_fire
+        self.rate_of_fire = rate_of_fire
+        self.speed_of_the_bullet = speed_of_the_bullet
+
+        self.damage = 50
+
+        pygame.draw.rect(self.image_tower, pygame.Color("pink"), (0, 0, CELL_SIZE, CELL_SIZE))
+
+        class RadiusFire(pygame.sprite.Sprite):
+            def __init__(self:
+            super.__init__(all_sprites)
+                self.image_radius_of_fire = pygame.Surface((2 * self.radius_of_the_fire, 2 * self.radius_of_the_fire),
+                                                           pygame.SRCALPHA, 32)
+
+            pygame.draw.circle(self.image_radius_of_fire, pygame.Color("purple"),
+                               (self.radius_of_the_fire, self.radius_of_the_fire), self.radius_of_the_fire)
+
+        class RadiusFragments(pygame.sprite.Sprite):
+            def __init__(self):
+                super.__init__(all_sprites)
+                self.image_radius_fragments = pygame.Surface((2 * self.radius_fragments, 2 * self.radius_fragments),
+                                                             pygame.SRCALPHA, 32)
+                self.image_radius_fragments.rect = self.image_radius_fragments.get_rect()
+                # pygame.draw.circle(self.image_radius_fragments, pygame.Color("purple"),
+                #                    (self.radius_of_the_fire, self.radius_of_the_fire), self.radius_of_the_fire)
+
+        self.object_RadiusFire = RadiusFire()
+        self.object_RadiusFragments = RadiusFragments()
+
+
 class Enemy(pygame.sprite.Sprite):
     pass
 
 
+class BulletArtillery(Bullet):
+    def __init__(self, x_y_spawn, speed_of_the_bullet, enemy_tsel, damage, radius_fragments):
+        super.__init__(x_y_spawn, speed_of_the_bullet, enemy_tsel, damage)
+        self.radius_fragments = radius_fragments
 
-
+    def check_collide_bullet_with_enemy(self):
+        if pygame.sprite.sprite.collide_rect(self.enemy_tsel, self):
+            vragi = pygame.sprite.spritecollide(self.radius_fragments, group_enemy)
+            self.enemy_tsel.damage(self.damage)
+            for enemy in vragi:
+                self.enemy.damage(self.damage)
+            self.kill()
