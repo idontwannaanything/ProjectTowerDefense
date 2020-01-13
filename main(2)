@@ -1,0 +1,114 @@
+  import pygame as pg
+import os
+
+
+def load_image(name, colorkey=None):
+    fullname = os.path.join('data', name)
+    image = pg.image.load(fullname).convert()
+    if colorkey is not None:
+        if colorkey == -1:
+            colorkey = image.get_at((0, 0))
+        image.set_colorkey(colorkey)
+    else:
+        image = image.convert_alpha()
+    return image
+
+
+class Board:
+    def __init__(self, left, top, cell_size):
+        self.left, self.top, self.cell_size = left, top, cell_size
+        self.fon = load_image("map2.png")
+        self.board = [
+                        [1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+                        [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+                        [0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1],
+                        [0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1],
+                        [0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1],
+                        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                        [1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1],
+                        [1, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1],
+                        [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+                        [1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1],
+                        [1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+                        [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        ]
+        self.width, self.height = 12, 12
+
+    def draw_fon(self):
+        screen.blit(self.fon, (0, 0))
+
+    def draw_rects(self):
+        for i in range(self.height):
+            for j in range(self.width):
+                if self.board[i][j] == 1:
+                    pg.draw.rect(screen, (150, 150, 50), (self.left + self.cell_size * j, self.top + self.cell_size * i, self.cell_size, self.cell_size), 1)
+
+
+class FirstEnemy:
+    global fps, left, top, cell_size, board
+
+    def __init__(self, pos, step):
+        self.image = load_image("check.png")
+        self.step = 10
+        if pos == 0:
+            self.x, self.y = 155, 70
+            self.vector = [0, 1]
+            self.changes = [[1, 0], [0, 1], [-1, 0]]
+        if pos == 1:
+            self.x, self.y = x, y
+            self.vector = [-1, 0]
+            self.changes = [[0, 1], [-1, 0]]
+        if pos == 3:
+            self.x, self.y = x, y
+            self.vector = [[0, -1], [-1, 0], [0, 1], [-1, 0]]
+
+    def draw(self):
+        screen.blit(self.image, (int(self.x), int(self.y)))
+
+    def move(self):
+        if self.check_move():
+            self.do_move()
+
+    def check_move(self):
+        # i, j = (self.x - left) // cell_size, (self.y - top) // cell_size
+        # print(i, j, board.board[j][i])
+
+        # return board.board[j][i]
+        #     # x = self.x + self.step * self.vector[0]
+            # y = self.y + self.step * self.vector[1]
+
+    def do_move(self):
+        self.x += self.step * self.vector[1]
+        self.y += self.step * self.vector[0]
+
+
+pg.init()
+size = (800, 600)
+screen = pg.display.set_mode(size)
+
+left, top, cell_size = 155, 70, 45
+
+running = True
+fps = 60
+board = Board(155, 70, 45)
+enemies = []
+enemies.append(FirstEnemy(0, 10))
+# enemies.append(FirstEnemy(250, 250))
+
+while running:
+    board.draw_fon()
+    board.draw_rects()
+
+    for i in enemies:
+        print(i.vector)
+        i.move()
+        i.draw()
+        print(i.x, i.y)
+
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            running = False
+
+    pg.display.flip()
+
+pg.quit()
