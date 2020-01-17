@@ -310,3 +310,4 @@ while running:
     all_sprites.draw(screen)
     clock.tick(20)
     pygame.display.flip()
+    print(0)
